@@ -30,7 +30,4 @@ public class UserController {
         return userService.userLogin(email, password);
     }
     
-    
-    
-    
 }
