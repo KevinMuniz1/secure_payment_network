@@ -6,7 +6,7 @@ import Register from "./pages/Login"
 function App() {
 
   return(
-    <Dash />
+    <Register />
   ) 
 }
 

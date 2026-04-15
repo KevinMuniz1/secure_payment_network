@@ -1,13 +1,10 @@
-
+import LoginForm from "../components/registerTextbox"
 
 export default function Register() {
 
     return (
-
-        <div>
-            <a>
-                register page
-            </a>
-        </div>
-    )
+    <div>
+    <LoginForm/>
+    </div>
+    );
 }

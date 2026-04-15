@@ -2,14 +2,10 @@
 
 export default function Dash() {
 
-    return (
-    <div style={{color: "red"}}>
+    return(
+    <a>
+        stuff
+    </a>
 
-        <a>
-        This is where the table will go
-        </a>
- 
-
-    </div>
-    )
-}
+    );
+};
