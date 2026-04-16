@@ -1,6 +1,7 @@
 package com.kevinmuniz.secure_payment_network.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.kevinmuniz.secure_payment_network.model.User;
@@ -13,6 +14,8 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     
     public User createAccount(User user){
@@ -23,7 +26,19 @@ public class UserServiceImpl implements UserService {
 
             throw new RuntimeException("Email Already Exist");
         }
-        
+
+        user.setEmail(email);
+
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+
+        String name = user.getName();
+
+        user.setName(name);
+
+        String username = user.getUserName();
+
+        user.setUserName(username);
+
         return userRepository.save(user);
     }
 
@@ -35,7 +50,7 @@ public class UserServiceImpl implements UserService {
             return false;
         } 
         
-        return user.getPassword().equals(password);
+        return user.getPassword().equals(passwordEncoder.encode(password));
     }
 
 

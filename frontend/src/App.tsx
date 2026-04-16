@@ -1,5 +1,3 @@
-import Dash from "./pages/Dashboard"
-
 import Register from "./pages/Login"
 
 
@@ -9,5 +7,4 @@ function App() {
     <Register />
   ) 
 }
-
 export default App;
