@@ -1,11 +1,18 @@
 package com.kevinmuniz.secure_payment_network.service;
 
+import java.time.LocalDateTime;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.kevinmuniz.secure_payment_network.config.JwtUtil;
+import com.kevinmuniz.secure_payment_network.dto.LoginRequest;
+import com.kevinmuniz.secure_payment_network.dto.LoginResponse;
+import com.kevinmuniz.secure_payment_network.dto.RegisterRequest;
 import com.kevinmuniz.secure_payment_network.model.User;
 import com.kevinmuniz.secure_payment_network.repository.UserRepository;
+
 
 
 
@@ -16,41 +23,65 @@ public class UserServiceImpl implements UserService {
     private UserRepository userRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private JwtUtil jwtUtil;
 
     
-    public User createAccount(User user){
+    public User createAccount(RegisterRequest registerRequest){
 
-        String email = user.getEmail();
+        User user = new User();
+
+        
+        String email = registerRequest.getEmail();
 
         if (userRepository.findByEmail(email) != null) {
 
             throw new RuntimeException("Email Already Exist");
         }
 
+        
+        String firstName = registerRequest.getFirstName();
+        user.setFirstName(firstName);
+
+        String lastName = registerRequest.getLastName();
+        user.setLastName(lastName);
+
+        
         user.setEmail(email);
 
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setHashedPassword(passwordEncoder.encode(registerRequest.getPassword()));
 
-        String name = user.getName();
+        user.setRole("USER");
 
-        user.setName(name);
+        user.setAccountStatus("ACTIVE");
 
-        String username = user.getUserName();
+        user.setCreatedAt(LocalDateTime.now());
 
-        user.setUserName(username);
+        user.setUpdatedAt(LocalDateTime.now());
+
 
         return userRepository.save(user);
     }
 
-    public boolean userLogin(String email, String password){
 
-        User user = userRepository.findByEmail(email);
+    public LoginResponse userLogin(LoginRequest loginRequest){
+
+        User user = userRepository.findByEmail(loginRequest.getEmail());
 
         if (user == null){
-            return false;
+            return null;
         } 
+
         
-        return user.getPassword().equals(passwordEncoder.encode(password));
+        if (passwordEncoder.matches(loginRequest.getPassword(), user.getHashedPassword())) {
+            LoginResponse response = new LoginResponse();
+            response.setToken(jwtUtil.generateToken(user.getEmail()));
+            response.setEmail(user.getEmail());
+            response.setRole(user.getRole());
+            return response;
+        }
+
+        return null;
     }
 
 

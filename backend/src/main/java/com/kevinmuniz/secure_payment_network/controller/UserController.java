@@ -9,6 +9,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import com.kevinmuniz.secure_payment_network.model.User;
 
 
+import com.kevinmuniz.secure_payment_network.dto.LoginRequest;
+import com.kevinmuniz.secure_payment_network.dto.LoginResponse;
+import com.kevinmuniz.secure_payment_network.dto.RegisterRequest;
+
+
 
 
 @RestController
@@ -19,15 +24,15 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/register")
-    public User createAccount(@RequestBody User user) {
+    public User createAccount(@RequestBody RegisterRequest registerRequest) {
 
-        return userService.createAccount(user);
+        return userService.createAccount(registerRequest);
     }
 
     @PostMapping("/login")
-    public boolean getMethodName(@RequestBody String email, @RequestBody String password){
+    public LoginResponse userLogin(@RequestBody LoginRequest loginRequest) {
 
-        return userService.userLogin(email, password);
+        return userService.userLogin(loginRequest);
     }
     
 }
