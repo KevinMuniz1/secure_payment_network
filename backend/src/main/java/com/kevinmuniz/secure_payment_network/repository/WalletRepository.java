@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import com.kevinmuniz.secure_payment_network.model.User;
 import com.kevinmuniz.secure_payment_network.model.Wallet;
+import java.util.Optional;
 
 
 @Repository
@@ -14,6 +15,10 @@ public interface WalletRepository extends JpaRepository<Wallet, UUID> {
 
     List<Wallet> findByUser(User user);
 
+    Optional<Wallet> findById(UUID id);
 
-    
+    void deleteById(Wallet wallet);
+
+
+
 }

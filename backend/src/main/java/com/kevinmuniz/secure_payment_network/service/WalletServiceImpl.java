@@ -1,15 +1,20 @@
 package com.kevinmuniz.secure_payment_network.service;
 
 import java.util.UUID;
+import java.util.Optional;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+
 import com.kevinmuniz.secure_payment_network.dto.CreateWalletRequest;
 import com.kevinmuniz.secure_payment_network.model.Wallet;
 import com.kevinmuniz.secure_payment_network.repository.WalletRepository;
 import com.kevinmuniz.secure_payment_network.repository.UserRepository;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import com.kevinmuniz.secure_payment_network.model.User;
@@ -46,6 +51,44 @@ public class WalletServiceImpl implements WalletService {
         User user = userRepository.findById(userId).orElse(null);
 
         return walletRepository.findByUser(user);
+    }
+
+    public Optional<Wallet> getWalletById(UUID id){
+
+
+        return walletRepository.findById(id);
+
+    }
+
+    public void deleteWalletById(UUID id){
+
+        walletRepository.deleteById(id);
+
+    }
+
+    public void depositById(UUID id, BigDecimal amount){
+
+       Wallet wallet = walletRepository.findById(id).orElseThrow();
+
+       wallet.setBalance(wallet.getBalance().add(amount));
+
+       walletRepository.save(wallet);
+
+    }
+
+    public void withdrawById(UUID id, BigDecimal amount){
+
+        Wallet wallet = walletRepository.findById(id).orElseThrow();
+
+
+        if (wallet.getBalance().compareTo(amount) >= 0){
+            wallet.setBalance(wallet.getBalance().subtract(amount));
+            walletRepository.save(wallet);
+        } else {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Insufficient funds");
+
+        }
+        
     }
 
     
