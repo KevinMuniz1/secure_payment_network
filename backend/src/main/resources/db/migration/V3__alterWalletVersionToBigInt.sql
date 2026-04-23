@@ -1,0 +1,3 @@
+
+
+ALTER TABLE Wallet ALTER COLUMN version TYPE BIGINT;

@@ -1,6 +1,7 @@
 package com.kevinmuniz.secure_payment_network.config;
 
 import java.io.IOException;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -30,8 +31,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             if (authHeader != null && authHeader.startsWith("Bearer")){
                 String token = authHeader.substring(7);
                 if (jwtUtil.validateToken(token)){
-                    String email = jwtUtil.extractEmail(token);
-                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(email, null, Collections.emptyList());
+                    UUID userId = jwtUtil.extractUserId(token);
+                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userId, null, Collections.emptyList());
                     SecurityContextHolder.getContext().setAuthentication(authToken);
                 }
             }

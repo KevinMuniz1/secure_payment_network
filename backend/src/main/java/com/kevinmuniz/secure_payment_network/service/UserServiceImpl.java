@@ -63,7 +63,7 @@ public class UserServiceImpl implements UserService {
         return userRepository.save(user);
     }
 
-
+    
     public LoginResponse userLogin(LoginRequest loginRequest){
 
         User user = userRepository.findByEmail(loginRequest.getEmail());
@@ -75,7 +75,7 @@ public class UserServiceImpl implements UserService {
         
         if (passwordEncoder.matches(loginRequest.getPassword(), user.getHashedPassword())) {
             LoginResponse response = new LoginResponse();
-            response.setToken(jwtUtil.generateToken(user.getEmail()));
+            response.setToken(jwtUtil.generateToken(user.getId()));
             response.setEmail(user.getEmail());
             response.setRole(user.getRole());
             return response;
