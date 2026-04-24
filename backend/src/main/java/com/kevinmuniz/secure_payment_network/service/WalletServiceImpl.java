@@ -7,17 +7,20 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.kevinmuniz.secure_payment_network.dto.CreateWalletRequest;
 import com.kevinmuniz.secure_payment_network.model.Wallet;
 import com.kevinmuniz.secure_payment_network.repository.WalletRepository;
 import com.kevinmuniz.secure_payment_network.repository.UserRepository;
+import com.kevinmuniz.secure_payment_network.dto.TransferRequest;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import com.kevinmuniz.secure_payment_network.model.User;
+
 
 
 
@@ -89,6 +92,26 @@ public class WalletServiceImpl implements WalletService {
 
         }
         
+    }
+
+    @Transactional
+    public void transferRequest(TransferRequest transferRequest){
+
+        Wallet fromWallet = walletRepository.findById(transferRequest.getFromWalletId()).orElseThrow();
+
+        Wallet toWallet = walletRepository.findById(transferRequest.getToWalletId()).orElseThrow();
+
+        BigDecimal transferAmount = transferRequest.getAmount();
+
+        if (fromWallet.getBalance().compareTo(transferAmount) >= 0) {
+            fromWallet.setBalance(fromWallet.getBalance().subtract(transferAmount));
+            toWallet.setBalance(toWallet.getBalance().add(transferAmount));
+            walletRepository.save(fromWallet);
+            walletRepository.save(toWallet);
+        } else {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Transfer Unsuccessful");
+        }
+
     }
 
     

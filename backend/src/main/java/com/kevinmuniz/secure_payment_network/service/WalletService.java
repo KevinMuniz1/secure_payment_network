@@ -9,6 +9,7 @@ import java.util.Optional;
 import com.kevinmuniz.secure_payment_network.model.Wallet;
 
 import com.kevinmuniz.secure_payment_network.dto.CreateWalletRequest;
+import com.kevinmuniz.secure_payment_network.dto.TransferRequest;
 
 public interface WalletService {
 
@@ -23,6 +24,8 @@ public interface WalletService {
     void depositById(UUID id, BigDecimal amount);
 
     void withdrawById(UUID id, BigDecimal amount);
+
+    void transferRequest(TransferRequest transferRequest);
 
 
     

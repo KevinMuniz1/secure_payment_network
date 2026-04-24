@@ -19,6 +19,4 @@ public interface WalletRepository extends JpaRepository<Wallet, UUID> {
 
     void deleteById(Wallet wallet);
 
-
-
 }

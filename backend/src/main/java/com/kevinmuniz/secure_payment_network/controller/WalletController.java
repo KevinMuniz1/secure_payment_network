@@ -1,6 +1,5 @@
 package com.kevinmuniz.secure_payment_network.controller;
 
-import org.apache.catalina.connector.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -13,12 +12,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import com.kevinmuniz.secure_payment_network.model.Wallet;
 import com.kevinmuniz.secure_payment_network.dto.CreateWalletRequest;
+import com.kevinmuniz.secure_payment_network.dto.TransferRequest;
+
 import java.util.UUID;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.http.ResponseEntity;
 
 
@@ -77,9 +77,17 @@ public class WalletController {
         
         return ResponseEntity.noContent().build();
     }
-    
-    
 
-    
+    @PostMapping("/transferFunds")
+    public ResponseEntity<Void> transferFunds(@RequestBody TransferRequest transferRequest) {
+
+        walletService.transferRequest(transferRequest);
+
+        return ResponseEntity.noContent().build();
+
+
+    }
+
+
     }
 
