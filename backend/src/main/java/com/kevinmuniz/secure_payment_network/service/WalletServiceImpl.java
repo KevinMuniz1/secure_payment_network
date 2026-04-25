@@ -12,8 +12,11 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.kevinmuniz.secure_payment_network.dto.CreateWalletRequest;
 import com.kevinmuniz.secure_payment_network.model.Wallet;
+import com.kevinmuniz.secure_payment_network.model.Transaction;
+import com.kevinmuniz.secure_payment_network.model.TransactionType;
 import com.kevinmuniz.secure_payment_network.repository.WalletRepository;
 import com.kevinmuniz.secure_payment_network.repository.UserRepository;
+import com.kevinmuniz.secure_payment_network.repository.TransactionRepository;
 import com.kevinmuniz.secure_payment_network.dto.TransferRequest;
 
 import java.math.BigDecimal;
@@ -27,10 +30,15 @@ import com.kevinmuniz.secure_payment_network.model.User;
 @Service
 public class WalletServiceImpl implements WalletService {
 
+    private final TransactionRepository transactionRepository;
     @Autowired
     private WalletRepository walletRepository;
     @Autowired
     private UserRepository userRepository;
+
+    WalletServiceImpl(TransactionRepository transactionRepository) {
+        this.transactionRepository = transactionRepository;
+    }
 
     public Wallet createWalletForUser(UUID userId, CreateWalletRequest createWalletRequest) {
         
@@ -77,6 +85,26 @@ public class WalletServiceImpl implements WalletService {
 
        walletRepository.save(wallet);
 
+       Transaction transaction = new Transaction();
+
+       transaction.setSender(wallet.getUser());
+
+       transaction.setReceiver(wallet.getUser());
+
+       transaction.setWallet(wallet);
+
+       transaction.setAmount(amount);
+
+       transaction.setType(TransactionType.DEPOSIT);
+
+       transaction.setStatus("Completed");
+
+       transaction.setCreatedAt(LocalDateTime.now());
+
+       transaction.setUpdatedAt(LocalDateTime.now());
+
+       transactionRepository.save(transaction);
+
     }
 
     public void withdrawById(UUID id, BigDecimal amount){
@@ -86,11 +114,33 @@ public class WalletServiceImpl implements WalletService {
 
         if (wallet.getBalance().compareTo(amount) >= 0){
             wallet.setBalance(wallet.getBalance().subtract(amount));
+            
             walletRepository.save(wallet);
+
+            Transaction transaction = new Transaction();
+
+            transaction.setSender(wallet.getUser());
+
+            transaction.setReceiver(wallet.getUser());
+
+            transaction.setWallet(wallet);
+
+            transaction.setAmount(amount);
+
+            transaction.setType(TransactionType.WITHDRAW);
+
+            transaction.setStatus("Completed");
+
+            transaction.setCreatedAt(LocalDateTime.now());
+
+            transaction.setUpdatedAt(LocalDateTime.now());
+
+            transactionRepository.save(transaction);
         } else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Insufficient funds");
 
         }
+
         
     }
 
@@ -108,11 +158,29 @@ public class WalletServiceImpl implements WalletService {
             toWallet.setBalance(toWallet.getBalance().add(transferAmount));
             walletRepository.save(fromWallet);
             walletRepository.save(toWallet);
+
+            Transaction transaction = new Transaction();
+
+            transaction.setSender(fromWallet.getUser());
+
+            transaction.setReceiver(toWallet.getUser());
+
+            transaction.setWallet(fromWallet);
+
+            transaction.setAmount(transferAmount);
+
+            transaction.setType(TransactionType.TRANSFER);
+
+            transaction.setStatus("Completed");
+
+            transaction.setCreatedAt(LocalDateTime.now());
+
+            transaction.setUpdatedAt(LocalDateTime.now());
+
+            transactionRepository.save(transaction);
         } else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Transfer Unsuccessful");
         }
-
     }
-
     
 }

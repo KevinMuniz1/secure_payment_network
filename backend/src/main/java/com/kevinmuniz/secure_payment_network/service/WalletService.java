@@ -27,6 +27,5 @@ public interface WalletService {
 
     void transferRequest(TransferRequest transferRequest);
 
-
     
 }
