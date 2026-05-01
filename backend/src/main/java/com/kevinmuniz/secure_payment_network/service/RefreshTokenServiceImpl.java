@@ -4,7 +4,7 @@ import com.kevinmuniz.secure_payment_network.model.RefreshToken;
 import com.kevinmuniz.secure_payment_network.model.User;
 import com.kevinmuniz.secure_payment_network.repository.RefreshTokenRepository;
 
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -52,7 +52,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
         return refreshToken;
 
     }
-
+    @Transactional
     public void deleteRefreshToken(User user){
 
         refreshTokenRepository.deleteByUser(user);
