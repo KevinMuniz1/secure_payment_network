@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import com.kevinmuniz.secure_payment_network.model.Wallet;
+import com.kevinmuniz.secure_payment_network.model.Transaction;
 import com.kevinmuniz.secure_payment_network.dto.CreateWalletRequest;
 import com.kevinmuniz.secure_payment_network.dto.TransferRequest;
 
@@ -20,6 +21,7 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.http.ResponseEntity;
+
 
 
 
@@ -84,10 +86,11 @@ public class WalletController {
         walletService.transferRequest(transferRequest);
 
         return ResponseEntity.noContent().build();
-
-
     }
 
-
+    @GetMapping("/{id}/transactions")
+    public List<Transaction> getTransactionsByWallet(@PathVariable UUID id) {
+        return walletService.getTransactionsByWallet(id);
     }
 
+    }

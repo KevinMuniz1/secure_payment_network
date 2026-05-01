@@ -5,7 +5,6 @@ import java.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
 import com.kevinmuniz.secure_payment_network.config.JwtUtil;
 import com.kevinmuniz.secure_payment_network.dto.LoginRequest;
 import com.kevinmuniz.secure_payment_network.dto.LoginResponse;
@@ -25,6 +24,9 @@ public class UserServiceImpl implements UserService {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private JwtUtil jwtUtil;
+
+    @Autowired
+    private RefreshTokenService refreshTokenService;
 
     
     public User createAccount(RegisterRequest registerRequest){
@@ -78,6 +80,7 @@ public class UserServiceImpl implements UserService {
             response.setToken(jwtUtil.generateToken(user.getId()));
             response.setEmail(user.getEmail());
             response.setRole(user.getRole());
+            response.setRefreshToken(refreshTokenService.createRefreshToken(user).getToken());
             return response;
         }
 

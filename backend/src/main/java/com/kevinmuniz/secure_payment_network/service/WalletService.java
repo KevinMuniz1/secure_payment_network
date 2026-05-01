@@ -10,6 +10,7 @@ import com.kevinmuniz.secure_payment_network.model.Wallet;
 
 import com.kevinmuniz.secure_payment_network.dto.CreateWalletRequest;
 import com.kevinmuniz.secure_payment_network.dto.TransferRequest;
+import com.kevinmuniz.secure_payment_network.model.Transaction;
 
 public interface WalletService {
 
@@ -26,6 +27,8 @@ public interface WalletService {
     void withdrawById(UUID id, BigDecimal amount);
 
     void transferRequest(TransferRequest transferRequest);
+
+    List<Transaction> getTransactionsByWallet(UUID walletId);
 
     
 }

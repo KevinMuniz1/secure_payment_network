@@ -3,6 +3,8 @@ package com.kevinmuniz.secure_payment_network.model;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -26,7 +28,7 @@ public class User {
     @Column(name = "last_name", nullable = false)
     private String lastName;
 
-
+    @JsonIgnore
     @Column(name = "hashed_password", nullable = false)
     private String hashedPassword;
 

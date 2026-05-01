@@ -12,6 +12,7 @@ import java.math.BigDecimal;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 
 
 
@@ -37,6 +38,7 @@ public class Wallet {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
+    @Version
     @Column(name = "version", nullable = false)
     private Long version;
 

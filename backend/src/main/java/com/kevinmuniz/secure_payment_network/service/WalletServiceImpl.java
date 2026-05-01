@@ -182,5 +182,10 @@ public class WalletServiceImpl implements WalletService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Transfer Unsuccessful");
         }
     }
+
+    public List<Transaction> getTransactionsByWallet(UUID walletId){
+        Wallet wallet = walletRepository.findById(walletId).orElseThrow();
+        return transactionRepository.findByWallet(wallet);
+    }
     
 }
