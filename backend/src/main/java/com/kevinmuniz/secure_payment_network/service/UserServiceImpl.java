@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
 import com.kevinmuniz.secure_payment_network.config.JwtUtil;
 import com.kevinmuniz.secure_payment_network.dto.LoginRequest;
 import com.kevinmuniz.secure_payment_network.dto.LoginResponse;
@@ -28,7 +29,7 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private RefreshTokenService refreshTokenService;
 
-    
+    @Override
     public User createAccount(RegisterRequest registerRequest){
 
         User user = new User();
@@ -65,7 +66,7 @@ public class UserServiceImpl implements UserService {
         return userRepository.save(user);
     }
 
-    
+    @Override
     public LoginResponse userLogin(LoginRequest loginRequest){
 
         User user = userRepository.findByEmail(loginRequest.getEmail());
