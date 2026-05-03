@@ -39,6 +39,15 @@ public class User {
     @Column(name = "role", nullable = false)
     private String role;
 
+    @Column(name = "totp_secret")
+    private String totpSecret;
+
+    @Column(name = "totp_enabled")
+    private Boolean totpEnabled = false;
+
+    @Column(name = "totp_verified")
+    private Boolean totpVerified = false;
+
     @Column(name = "account_status", nullable = false)
     private String accountStatus;
 
@@ -90,6 +99,39 @@ public class User {
     public void setRole(String role){
 
         this.role = role;
+
+    }
+
+    public String getTotpSecret(){
+
+        return totpSecret;
+    }
+
+    public void setTotpSecret(String totpSecret){
+
+        this.totpSecret = totpSecret;
+
+    }
+
+    public Boolean getTotpEnabled(){
+
+        return totpEnabled;
+    }
+
+    public void setTotpEnabled(Boolean totpEnabled){
+
+        this.totpEnabled = totpEnabled;
+
+    }
+
+    public Boolean getTotpVerified(){
+
+        return totpVerified;
+    }
+
+    public void setTotpVerified(Boolean totpVerified){
+
+        this.totpVerified = totpVerified;
 
     }
 

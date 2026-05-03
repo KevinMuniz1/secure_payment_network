@@ -31,6 +31,10 @@ dependencies {
 	implementation "io.jsonwebtoken:jjwt-api:0.12.6"
 	implementation "io.jsonwebtoken:jjwt-impl:0.12.6"
 	implementation "io.jsonwebtoken:jjwt-jackson:0.12.6"	
+	implementation 'com.eatthepath:java-otp:0.4.0'
+	implementation 'commons-codec:commons-codec:1.16.1'
+	implementation 'com.google.zxing:core:3.5.3'
+	implementation 'com.google.zxing:javase:3.5.3'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
 	runtimeOnly 'org.postgresql:postgresql'
