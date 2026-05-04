@@ -1,0 +1,9 @@
+{
+  "properties": [
+    {
+      "name": "fraud.detection.service.url",
+      "type": "java.lang.String",
+      "description": "Base URL of the Python fraud detection microservice (e.g. http://localhost:8000)."
+    }
+  ]
+}

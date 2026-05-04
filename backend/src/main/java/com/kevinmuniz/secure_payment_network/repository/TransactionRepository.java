@@ -5,6 +5,7 @@ import org.springframework.stereotype.Repository;
 import com.kevinmuniz.secure_payment_network.model.Transaction;
 import com.kevinmuniz.secure_payment_network.model.Wallet;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -12,5 +13,6 @@ import java.util.UUID;
 public interface TransactionRepository extends JpaRepository<Transaction, UUID> {
 
     List<Transaction> findByWallet(Wallet wallet);
-    
+
+    long countByWalletAndCreatedAtAfter(Wallet wallet, LocalDateTime since);
 }
