@@ -16,5 +16,7 @@ public interface TotpService {
     boolean verifyTotpCode(String secret, String code);
 
     boolean verifyAndUseRecoveryCode(String code, User user);
+
+    void disableTotp(User user);
     
 }

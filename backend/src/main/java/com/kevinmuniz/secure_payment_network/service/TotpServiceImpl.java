@@ -13,11 +13,13 @@ import javax.crypto.spec.SecretKeySpec;
 import org.apache.commons.codec.binary.Base32;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.eatthepath.otp.TimeBasedOneTimePasswordGenerator;
 import com.kevinmuniz.secure_payment_network.model.RecoveryCode;
 import com.kevinmuniz.secure_payment_network.model.User;
 import com.kevinmuniz.secure_payment_network.repository.RecoveryCodesRepository;
+import com.kevinmuniz.secure_payment_network.repository.UserRepository;
 
 
 
@@ -26,6 +28,9 @@ public class TotpServiceImpl implements TotpService {
 
     @Autowired
     private RecoveryCodesRepository recoveryCodesRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
         @Override
         public String generateTotpSecret() {
@@ -94,8 +99,18 @@ public class TotpServiceImpl implements TotpService {
             }
 
             return false;
-            
+
         }
 
-    
+        @Override
+        @Transactional
+        public void disableTotp(User user) {
+            user.setTotpEnabled(false);
+            user.setTotpVerified(false);
+            user.setTotpSecret(null);
+            userRepository.save(user);
+            recoveryCodesRepository.deleteByUser_Id(user.getId());
+        }
+
+
 }

@@ -48,6 +48,9 @@ public class User {
     @Column(name = "totp_verified")
     private Boolean totpVerified = false;
 
+    @Column(name = "email_otp_enabled")
+    private Boolean emailOtpEnabled = false;
+
     @Column(name = "account_status", nullable = false)
     private String accountStatus;
 
@@ -132,6 +135,18 @@ public class User {
     public void setTotpVerified(Boolean totpVerified){
 
         this.totpVerified = totpVerified;
+
+    }
+
+    public Boolean getEmailOtpEnabled(){
+
+        return emailOtpEnabled;
+
+    }
+
+    public void setEmailOtpEnabled(Boolean emailOtpEnabled){
+
+        this.emailOtpEnabled = emailOtpEnabled;
 
     }
 

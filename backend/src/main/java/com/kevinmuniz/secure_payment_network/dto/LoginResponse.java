@@ -11,6 +11,12 @@ public class LoginResponse {
 
     private String refreshToken;
 
+    private boolean requiresEmailOtp;
+
+    private boolean requiresTotp;
+
+    private String preAuthToken;
+
     public String getToken() {
         return token;
     }
@@ -43,6 +49,30 @@ public class LoginResponse {
         this.role = role;
     }
 
+    public boolean isRequiresEmailOtp() {
+        return requiresEmailOtp;
+    }
 
-    
+    public void setRequiresEmailOtp(boolean requiresEmailOtp) {
+        this.requiresEmailOtp = requiresEmailOtp;
+    }
+
+    public boolean isRequiresTotp() {
+        return requiresTotp;
+    }
+
+    public void setRequiresTotp(boolean requiresTotp) {
+        this.requiresTotp = requiresTotp;
+    }
+
+    public String getPreAuthToken() {
+        return preAuthToken;
+    }
+
+    public void setPreAuthToken(String preAuthToken) {
+        this.preAuthToken = preAuthToken;
+    }
+
+
+
 }

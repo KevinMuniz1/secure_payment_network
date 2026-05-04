@@ -31,6 +31,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             if (authHeader != null && authHeader.startsWith("Bearer ")){
                 String token = authHeader.substring(7);
                 if (jwtUtil.validateToken(token)){
+                    if (jwtUtil.isPreAuthToken(token)) {
+                        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                        response.getWriter().write("Full authentication required");
+                        return;
+                    }
                     UUID userId = jwtUtil.extractUserId(token);
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userId, null, Collections.emptyList());
                     SecurityContextHolder.getContext().setAuthentication(authToken);

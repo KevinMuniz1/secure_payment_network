@@ -29,6 +29,9 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private RefreshTokenService refreshTokenService;
 
+    @Autowired
+    private EmailOtpService emailOtpService;
+
     @Override
     public User createAccount(RegisterRequest registerRequest){
 
@@ -77,6 +80,26 @@ public class UserServiceImpl implements UserService {
 
         
         if (passwordEncoder.matches(loginRequest.getPassword(), user.getHashedPassword())) {
+
+            if (Boolean.TRUE.equals(user.getEmailOtpEnabled())) {
+                emailOtpService.sendOtp(user);
+                LoginResponse response = new LoginResponse();
+                response.setEmail(user.getEmail());
+                response.setRole(user.getRole());
+                response.setRequiresEmailOtp(true);
+                response.setPreAuthToken(jwtUtil.generatePreAuthToken(user.getId()));
+                return response;
+            }
+
+            if (Boolean.TRUE.equals(user.getTotpEnabled())) {
+                LoginResponse response = new LoginResponse();
+                response.setEmail(user.getEmail());
+                response.setRole(user.getRole());
+                response.setRequiresTotp(true);
+                response.setPreAuthToken(jwtUtil.generatePreAuthToken(user.getId()));
+                return response;
+            }
+
             LoginResponse response = new LoginResponse();
             response.setToken(jwtUtil.generateToken(user.getId()));
             response.setEmail(user.getEmail());

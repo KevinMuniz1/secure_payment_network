@@ -13,6 +13,6 @@ public interface RecoveryCodesRepository extends JpaRepository<RecoveryCode, UUI
 
     List<RecoveryCode> findByUser_Id(UUID userId);
 
-
+    void deleteByUser_Id(UUID userId);
 
 }

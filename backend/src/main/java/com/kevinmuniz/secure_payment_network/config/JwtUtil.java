@@ -48,6 +48,26 @@ public class JwtUtil {
         }
     }
 
+    public String generatePreAuthToken(UUID userId) {
+        return Jwts.builder()
+                .subject(userId.toString())
+                .claim("preAuth", "true")
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 5))
+                .signWith(secretKey)
+                .compact();
+    }
 
-    
+    public boolean isPreAuthToken(String token) {
+        try {
+            Object claim = Jwts.parser().verifyWith(secretKey).build()
+                    .parseSignedClaims(token).getPayload().get("preAuth");
+            return "true".equals(claim);
+        } catch (JwtException e) {
+            return false;
+        }
+    }
+
+
+
 }
