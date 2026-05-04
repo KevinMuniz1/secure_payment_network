@@ -1,5 +1,8 @@
 package com.kevinmuniz.secure_payment_network.service;
 
+import java.util.List;
+
+import com.kevinmuniz.secure_payment_network.model.RecoveryCode;
 import com.kevinmuniz.secure_payment_network.model.User;
 
 public interface EmailOtpService {
@@ -8,7 +11,7 @@ public interface EmailOtpService {
 
     boolean verifyOtp(User user, String code);
 
-    void enableEmailOtp(User user);
+    List<RecoveryCode> enableEmailOtp(User user);
 
     void disableEmailOtp(User user);
 }

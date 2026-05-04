@@ -35,6 +35,8 @@ public class WalletServiceImpl implements WalletService {
     private WalletRepository walletRepository;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private AuditLogService auditLogService;
 
     WalletServiceImpl(TransactionRepository transactionRepository) {
         this.transactionRepository = transactionRepository;
@@ -105,6 +107,8 @@ public class WalletServiceImpl implements WalletService {
 
        transactionRepository.save(transaction);
 
+       auditLogService.log(AuditLogService.DEPOSIT, wallet.getUser().getId(), "walletId=" + id + " amount=" + amount);
+
     }
 
     public void withdrawById(UUID id, BigDecimal amount){
@@ -136,6 +140,8 @@ public class WalletServiceImpl implements WalletService {
             transaction.setUpdatedAt(LocalDateTime.now());
 
             transactionRepository.save(transaction);
+
+            auditLogService.log(AuditLogService.WITHDRAWAL, wallet.getUser().getId(), "walletId=" + id + " amount=" + amount);
         } else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Insufficient funds");
 
@@ -178,6 +184,9 @@ public class WalletServiceImpl implements WalletService {
             transaction.setUpdatedAt(LocalDateTime.now());
 
             transactionRepository.save(transaction);
+
+            auditLogService.log(AuditLogService.TRANSFER, fromWallet.getUser().getId(),
+                "from=" + transferRequest.getFromWalletId() + " to=" + transferRequest.getToWalletId() + " amount=" + transferAmount);
         } else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Transfer Unsuccessful");
         }

@@ -2,6 +2,7 @@ package com.kevinmuniz.secure_payment_network.service;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.kevinmuniz.secure_payment_network.model.EmailOtpCode;
+import com.kevinmuniz.secure_payment_network.model.RecoveryCode;
 import com.kevinmuniz.secure_payment_network.model.User;
 import com.kevinmuniz.secure_payment_network.repository.EmailOtpCodeRepository;
 import com.kevinmuniz.secure_payment_network.repository.UserRepository;
@@ -24,6 +26,9 @@ public class EmailOtpServiceImpl implements EmailOtpService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private TotpService totpService;
 
     private final SecureRandom secureRandom = new SecureRandom();
 
@@ -60,9 +65,10 @@ public class EmailOtpServiceImpl implements EmailOtpService {
     }
 
     @Override
-    public void enableEmailOtp(User user) {
+    public List<RecoveryCode> enableEmailOtp(User user) {
         user.setEmailOtpEnabled(true);
         userRepository.save(user);
+        return totpService.generateRecoveryCodes(user);
     }
 
     @Override

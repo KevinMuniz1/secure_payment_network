@@ -32,6 +32,9 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private EmailOtpService emailOtpService;
 
+    @Autowired
+    private AuditLogService auditLogService;
+
     @Override
     public User createAccount(RegisterRequest registerRequest){
 
@@ -66,7 +69,9 @@ public class UserServiceImpl implements UserService {
         user.setUpdatedAt(LocalDateTime.now());
 
 
-        return userRepository.save(user);
+        User savedUser = userRepository.save(user);
+        auditLogService.log(AuditLogService.REGISTER, savedUser.getId(), "email=" + savedUser.getEmail());
+        return savedUser;
     }
 
     @Override
@@ -75,11 +80,13 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findByEmail(loginRequest.getEmail());
 
         if (user == null){
+            auditLogService.log(AuditLogService.LOGIN_FAILED, null, "email=" + loginRequest.getEmail());
             return null;
-        } 
+        }
 
-        
         if (passwordEncoder.matches(loginRequest.getPassword(), user.getHashedPassword())) {
+
+            auditLogService.log(AuditLogService.LOGIN_SUCCESS, user.getId(), "email=" + user.getEmail());
 
             if (Boolean.TRUE.equals(user.getEmailOtpEnabled())) {
                 emailOtpService.sendOtp(user);
@@ -108,6 +115,7 @@ public class UserServiceImpl implements UserService {
             return response;
         }
 
+        auditLogService.log(AuditLogService.LOGIN_FAILED, user.getId(), "email=" + user.getEmail());
         return null;
     }
 

@@ -30,7 +30,8 @@ public class SecurityConfig {
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/users/register", "/users/login", "/users/refresh", "/users/logout", "/auth/complete-email-otp", "/auth/complete-totp").permitAll()
+                .requestMatchers("/users/register", "/users/login", "/users/refresh", "/users/logout", "/auth/complete-email-otp", "/auth/complete-totp", "/auth/complete-email-otp-recovery").permitAll()
+                .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                 .anyRequest().authenticated()
                 
             );
