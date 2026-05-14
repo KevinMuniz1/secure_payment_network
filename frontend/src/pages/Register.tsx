@@ -4,20 +4,19 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
-import { login as apiLogin } from "@/api/auth";
-import type { FullAuthResponse } from "@/api/auth";
-import { useAuth } from "@/context/AuthContext";
+import { register as apiRegister } from "@/api/auth";
 
 const schema = z.object({
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
   email: z.string().email({ message: "Invalid email address" }),
-  password: z.string().min(1, "Password is required"),
+  password: z.string().min(8, "Password must be at least 8 characters"),
 });
 
 type FormData = z.infer<typeof schema>;
 
-export default function Login() {
+export default function Register() {
   const navigate = useNavigate();
-  const auth = useAuth();
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
@@ -31,35 +30,13 @@ export default function Login() {
     setLoading(true);
     setErrorMsg(null);
     try {
-      const response = await apiLogin(data);
-
-      if (response.requiresEmailOtp && response.preAuthToken) {
-        navigate("/verify-2fa", {
-          state: { preAuthToken: response.preAuthToken, method: "email" },
-        });
-        return;
-      }
-
-      if (response.requiresTOTP && response.preAuthToken) {
-        navigate("/verify-2fa", {
-          state: { preAuthToken: response.preAuthToken, method: "totp" },
-        });
-        return;
-      }
-
-      if (
-        response.token &&
-        response.refreshToken &&
-        response.email &&
-        response.role
-      ) {
-        auth.login(response as FullAuthResponse);
-        navigate("/dashboard");
-      }
+      await apiRegister(data);
+      toast.success("Account created! Please sign in.");
+      navigate("/login");
     } catch (err: unknown) {
       const message =
         (err as { response?: { data?: { message?: string } } })?.response?.data
-          ?.message ?? "Invalid email or password";
+          ?.message ?? "Registration failed. Please try again.";
       setErrorMsg(message);
       toast.error(message);
     } finally {
@@ -69,46 +46,11 @@ export default function Login() {
 
   return (
     <div className="min-h-screen flex bg-zinc-950">
-      {/* Left branding panel */}
-      <div className="hidden md:flex w-1/2 bg-zinc-900 relative flex-col items-center justify-center overflow-hidden">
-        {/* Decorative circle */}
-        <div
-          className="absolute -bottom-24 -left-24 w-96 h-96 rounded-full"
-          style={{ backgroundColor: "rgba(212,175,55,0.05)" }}
-        />
-        <div
-          className="absolute -top-16 -right-16 w-64 h-64 rounded-full"
-          style={{ backgroundColor: "rgba(212,175,55,0.04)" }}
-        />
-
-        <div className="relative z-10 flex flex-col items-center text-center px-12">
-          {/* Logo */}
-          <div className="flex items-center gap-3 mb-8">
-            <div
-              className="w-10 h-10 rounded-xl flex items-center justify-center"
-              style={{ backgroundColor: "#d4af37" }}
-            >
-              <span className="text-sm font-bold text-zinc-950">V</span>
-            </div>
-            <span className="text-white font-semibold tracking-wide text-lg">
-              Vault
-            </span>
-          </div>
-
-          <h1 className="text-4xl font-light text-white mt-8 leading-tight">
-            Banking, reimagined.
-          </h1>
-          <p className="text-zinc-500 text-sm mt-3">
-            Secure. Intelligent. Yours.
-          </p>
-        </div>
-      </div>
-
-      {/* Right form panel */}
+      {/* Left form panel */}
       <div className="w-full md:w-1/2 bg-zinc-950 flex items-center justify-center p-8">
         <div className="w-full max-w-sm">
-          {/* Mobile logo */}
-          <div className="flex items-center gap-3 mb-8 md:hidden">
+          {/* Logo */}
+          <div className="flex items-center gap-3 mb-8">
             <div
               className="w-8 h-8 rounded-lg flex items-center justify-center"
               style={{ backgroundColor: "#d4af37" }}
@@ -119,13 +61,44 @@ export default function Login() {
           </div>
 
           <p className="text-xs font-medium tracking-widest uppercase text-zinc-500">
-            Welcome Back
+            Get Started
           </p>
           <h2 className="text-2xl font-semibold text-white mt-1 mb-8">
-            Sign in to Vault
+            Create your account
           </h2>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <input
+                  type="text"
+                  placeholder="First name"
+                  autoComplete="given-name"
+                  className="bg-zinc-900 border border-zinc-700 text-white placeholder:text-zinc-600 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-zinc-500 w-full"
+                  {...register("firstName")}
+                />
+                {errors.firstName && (
+                  <p className="text-red-400 text-xs mt-1.5">
+                    {errors.firstName.message}
+                  </p>
+                )}
+              </div>
+              <div>
+                <input
+                  type="text"
+                  placeholder="Last name"
+                  autoComplete="family-name"
+                  className="bg-zinc-900 border border-zinc-700 text-white placeholder:text-zinc-600 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-zinc-500 w-full"
+                  {...register("lastName")}
+                />
+                {errors.lastName && (
+                  <p className="text-red-400 text-xs mt-1.5">
+                    {errors.lastName.message}
+                  </p>
+                )}
+              </div>
+            </div>
+
             <div>
               <input
                 type="email"
@@ -144,8 +117,8 @@ export default function Login() {
             <div>
               <input
                 type="password"
-                placeholder="Password"
-                autoComplete="current-password"
+                placeholder="Password (min. 8 characters)"
+                autoComplete="new-password"
                 className="bg-zinc-900 border border-zinc-700 text-white placeholder:text-zinc-600 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-zinc-500 w-full"
                 {...register("password")}
               />
@@ -165,18 +138,44 @@ export default function Login() {
               disabled={loading}
               className="w-full bg-white text-zinc-950 hover:bg-zinc-100 font-medium rounded-xl px-5 py-2.5 text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed mt-2"
             >
-              {loading ? "Signing in…" : "Sign in"}
+              {loading ? "Creating account…" : "Create account"}
             </button>
           </form>
 
           <p className="mt-6 text-center text-zinc-500 text-sm">
-            Don&apos;t have an account?{" "}
-            <Link
-              to="/register"
-              className="hover:text-white transition-colors"
-            >
-              Create one
+            Already have an account?{" "}
+            <Link to="/login" className="hover:text-white transition-colors">
+              Sign in
             </Link>
+          </p>
+        </div>
+      </div>
+
+      {/* Right branding panel */}
+      <div className="hidden md:flex w-1/2 bg-zinc-900 relative flex-col items-center justify-center overflow-hidden">
+        {/* Decorative circles */}
+        <div
+          className="absolute -top-24 -right-24 w-96 h-96 rounded-full"
+          style={{ backgroundColor: "rgba(212,175,55,0.05)" }}
+        />
+        <div
+          className="absolute -bottom-16 -left-16 w-64 h-64 rounded-full"
+          style={{ backgroundColor: "rgba(212,175,55,0.04)" }}
+        />
+
+        <div className="relative z-10 flex flex-col items-center text-center px-12">
+          <div
+            className="w-10 h-10 rounded-xl flex items-center justify-center mb-8"
+            style={{ backgroundColor: "#d4af37" }}
+          >
+            <span className="text-sm font-bold text-zinc-950">V</span>
+          </div>
+
+          <h1 className="text-4xl font-light text-white leading-tight">
+            Join thousands managing their finances smarter.
+          </h1>
+          <p className="text-zinc-500 text-sm mt-4">
+            Secure accounts. Real-time transfers. Intelligent fraud detection.
           </p>
         </div>
       </div>

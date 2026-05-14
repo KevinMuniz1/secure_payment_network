@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
@@ -28,14 +27,21 @@ import com.kevinmuniz.secure_payment_network.repository.WalletRepository;
 public class WalletServiceImpl implements WalletService {
 
     private final TransactionRepository transactionRepository;
+    private final WalletRepository walletRepository;
+    private final UserRepository userRepository;
+    private final AuditLogService auditLogService;
+    private final FraudDetectionService fraudDetectionService;
 
-    @Autowired private WalletRepository walletRepository;
-    @Autowired private UserRepository userRepository;
-    @Autowired private AuditLogService auditLogService;
-    @Autowired private FraudDetectionService fraudDetectionService;
-
-    WalletServiceImpl(TransactionRepository transactionRepository) {
+    WalletServiceImpl(TransactionRepository transactionRepository,
+                      WalletRepository walletRepository,
+                      UserRepository userRepository,
+                      AuditLogService auditLogService,
+                      FraudDetectionService fraudDetectionService) {
         this.transactionRepository = transactionRepository;
+        this.walletRepository = walletRepository;
+        this.userRepository = userRepository;
+        this.auditLogService = auditLogService;
+        this.fraudDetectionService = fraudDetectionService;
     }
 
     public Wallet createWalletForUser(UUID userId, CreateWalletRequest createWalletRequest) {
@@ -56,16 +62,21 @@ public class WalletServiceImpl implements WalletService {
         return walletRepository.findByUser(user);
     }
 
-    public Optional<Wallet> getWalletById(UUID id) {
-        return walletRepository.findById(id);
+    public Optional<Wallet> getWalletById(UUID id, UUID requestingUserId) {
+        Wallet wallet = walletRepository.findById(id).orElseThrow();
+        assertOwnership(wallet, requestingUserId);
+        return Optional.of(wallet);
     }
 
-    public void deleteWalletById(UUID id) {
+    public void deleteWalletById(UUID id, UUID requestingUserId) {
+        Wallet wallet = walletRepository.findById(id).orElseThrow();
+        assertOwnership(wallet, requestingUserId);
         walletRepository.deleteById(id);
     }
 
-    public void depositById(UUID id, BigDecimal amount) {
+    public void depositById(UUID id, BigDecimal amount, UUID requestingUserId) {
         Wallet wallet = walletRepository.findById(id).orElseThrow();
+        assertOwnership(wallet, requestingUserId);
         wallet.setBalance(wallet.getBalance().add(amount));
         walletRepository.save(wallet);
 
@@ -77,8 +88,9 @@ public class WalletServiceImpl implements WalletService {
             "walletId=" + id + " amount=" + amount);
     }
 
-    public void withdrawById(UUID id, BigDecimal amount) {
+    public void withdrawById(UUID id, BigDecimal amount, UUID requestingUserId) {
         Wallet wallet = walletRepository.findById(id).orElseThrow();
+        assertOwnership(wallet, requestingUserId);
 
         if (wallet.getBalance().compareTo(amount) < 0) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Insufficient funds");
@@ -102,9 +114,10 @@ public class WalletServiceImpl implements WalletService {
     }
 
     @Transactional
-    public void transferRequest(TransferRequest transferRequest) {
+    public void transferRequest(TransferRequest transferRequest, UUID requestingUserId) {
         Wallet fromWallet = walletRepository.findById(transferRequest.getFromWalletId()).orElseThrow();
         Wallet toWallet   = walletRepository.findById(transferRequest.getToWalletId()).orElseThrow();
+        assertOwnership(fromWallet, requestingUserId);
         BigDecimal amount = transferRequest.getAmount();
 
         if (fromWallet.getBalance().compareTo(amount) < 0) {
@@ -132,12 +145,19 @@ public class WalletServiceImpl implements WalletService {
             + " amount=" + amount);
     }
 
-    public List<Transaction> getTransactionsByWallet(UUID walletId) {
+    public List<Transaction> getTransactionsByWallet(UUID walletId, UUID requestingUserId) {
         Wallet wallet = walletRepository.findById(walletId).orElseThrow();
+        assertOwnership(wallet, requestingUserId);
         return transactionRepository.findByWallet(wallet);
     }
 
     // -------------------------------------------------------------------------
+
+    private void assertOwnership(Wallet wallet, UUID requestingUserId) {
+        if (!wallet.getUser().getId().equals(requestingUserId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
+        }
+    }
 
     private FraudCheckRequest buildFraudCheckRequest(Wallet wallet, BigDecimal amount, int txType) {
         LocalDateTime now = LocalDateTime.now();
