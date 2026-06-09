@@ -1,0 +1,16 @@
+# Environment secrets
+backend/.env
+
+# Build outputs
+backend/build/
+frontend/dist/
+frontend/node_modules/
+
+# Gradle
+backend/.gradle/
+backend/gradle/wrapper/gradle-wrapper.jar
+
+# IDE
+.idea/
+*.iml
+.vscode/settings.json

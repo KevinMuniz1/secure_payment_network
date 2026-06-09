@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
@@ -21,9 +22,14 @@ import jakarta.servlet.http.HttpServletResponse;
 @Component
 public class RateLimiterFilter implements Filter {
 
-    private static final int LOGIN_LIMIT = 10;
-    private static final int TRANSACTION_LIMIT = 200;
-    private static final int GENERAL_LIMIT = 300;
+    @Value("${rate.limiter.login.limit:10}")
+    private int LOGIN_LIMIT;
+
+    @Value("${rate.limiter.wallet.limit:200}")
+    private int TRANSACTION_LIMIT;
+
+    @Value("${rate.limiter.general.limit:300}")
+    private int GENERAL_LIMIT;
 
     private final Map<String, AtomicInteger> requestCounts = new ConcurrentHashMap<>();
     private final Map<String, LocalDateTime> windowStart = new ConcurrentHashMap<>();

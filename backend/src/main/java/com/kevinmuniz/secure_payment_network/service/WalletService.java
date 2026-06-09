@@ -18,17 +18,17 @@ public interface WalletService {
 
     List<Wallet> getWalletsForUser(UUID userId);
 
-    Optional<Wallet> getWalletById(UUID id);
+    Optional<Wallet> getWalletById(UUID id, UUID requestingUserId);
 
-    void deleteWalletById(UUID id);
+    void deleteWalletById(UUID id, UUID requestingUserId);
 
-    void depositById(UUID id, BigDecimal amount);
+    void depositById(UUID id, BigDecimal amount, UUID requestingUserId);
 
-    void withdrawById(UUID id, BigDecimal amount);
+    void withdrawById(UUID id, BigDecimal amount, UUID requestingUserId);
 
-    void transferRequest(TransferRequest transferRequest);
+    void transferRequest(TransferRequest transferRequest, UUID requestingUserId);
 
-    List<Transaction> getTransactionsByWallet(UUID walletId);
+    List<Transaction> getTransactionsByWallet(UUID walletId, UUID requestingUserId);
 
     
 }

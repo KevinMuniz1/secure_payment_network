@@ -70,7 +70,8 @@ public class WalletController {
     @GetMapping("/{id}")
     public Optional<Wallet> getWalletById(
             @Parameter(description = "Wallet UUID") @PathVariable UUID id) {
-        return walletService.getWalletById(id);
+        UUID userId = (UUID) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return walletService.getWalletById(id, userId);
     }
 
     @Operation(summary = "Delete wallet by ID", description = "Permanently deletes the specified wallet.")
@@ -82,7 +83,8 @@ public class WalletController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteWalletById(
             @Parameter(description = "Wallet UUID") @PathVariable UUID id) {
-        walletService.deleteWalletById(id);
+        UUID userId = (UUID) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        walletService.deleteWalletById(id, userId);
         return ResponseEntity.noContent().build();
     }
 
@@ -97,7 +99,8 @@ public class WalletController {
     public ResponseEntity<Void> depositByWalletId(
             @Parameter(description = "Wallet UUID") @PathVariable UUID id,
             @RequestBody BigDecimal amount) {
-        walletService.depositById(id, amount);
+        UUID userId = (UUID) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        walletService.depositById(id, amount, userId);
         return ResponseEntity.noContent().build();
     }
 
@@ -112,7 +115,8 @@ public class WalletController {
     public ResponseEntity<Void> withdrawById(
             @Parameter(description = "Wallet UUID") @PathVariable UUID id,
             @RequestBody BigDecimal amount) {
-        walletService.withdrawById(id, amount);
+        UUID userId = (UUID) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        walletService.withdrawById(id, amount, userId);
         return ResponseEntity.noContent().build();
     }
 
@@ -124,7 +128,8 @@ public class WalletController {
     })
     @PostMapping("/transferFunds")
     public ResponseEntity<Void> transferFunds(@RequestBody TransferRequest transferRequest) {
-        walletService.transferRequest(transferRequest);
+        UUID userId = (UUID) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        walletService.transferRequest(transferRequest, userId);
         return ResponseEntity.noContent().build();
     }
 
@@ -137,6 +142,7 @@ public class WalletController {
     @GetMapping("/{id}/transactions")
     public List<Transaction> getTransactionsByWallet(
             @Parameter(description = "Wallet UUID") @PathVariable UUID id) {
-        return walletService.getTransactionsByWallet(id);
+        UUID userId = (UUID) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return walletService.getTransactionsByWallet(id, userId);
     }
 }

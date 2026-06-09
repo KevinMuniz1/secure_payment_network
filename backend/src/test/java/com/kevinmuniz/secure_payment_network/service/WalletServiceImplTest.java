@@ -76,7 +76,7 @@ class WalletServiceImplTest {
     void depositById_increasesBalanceAndSavesTransaction() {
         when(walletRepository.findById(wallet.getId())).thenReturn(Optional.of(wallet));
 
-        walletService.depositById(wallet.getId(), new BigDecimal("100.00"));
+        walletService.depositById(wallet.getId(), new BigDecimal("100.00"), user.getId());
 
         assertThat(wallet.getBalance()).isEqualByComparingTo("600.00");
         verify(walletRepository).save(wallet);
@@ -93,7 +93,7 @@ class WalletServiceImplTest {
         when(transactionRepository.countByWalletAndCreatedAtAfter(any(), any())).thenReturn(0L);
         when(fraudDetectionService.isFraudulent(any(FraudCheckRequest.class))).thenReturn(false);
 
-        walletService.withdrawById(wallet.getId(), new BigDecimal("200.00"));
+        walletService.withdrawById(wallet.getId(), new BigDecimal("200.00"), user.getId());
 
         assertThat(wallet.getBalance()).isEqualByComparingTo("300.00");
         verify(walletRepository).save(wallet);
@@ -104,7 +104,7 @@ class WalletServiceImplTest {
     void withdrawById_insufficientFunds_throwsBadRequest() {
         when(walletRepository.findById(wallet.getId())).thenReturn(Optional.of(wallet));
 
-        assertThatThrownBy(() -> walletService.withdrawById(wallet.getId(), new BigDecimal("999.00")))
+        assertThatThrownBy(() -> walletService.withdrawById(wallet.getId(), new BigDecimal("999.00"), user.getId()))
             .isInstanceOf(ResponseStatusException.class)
             .hasMessageContaining("Insufficient funds");
 
@@ -119,7 +119,7 @@ class WalletServiceImplTest {
         when(transactionRepository.countByWalletAndCreatedAtAfter(any(), any())).thenReturn(0L);
         when(fraudDetectionService.isFraudulent(any(FraudCheckRequest.class))).thenReturn(true);
 
-        assertThatThrownBy(() -> walletService.withdrawById(wallet.getId(), new BigDecimal("200.00")))
+        assertThatThrownBy(() -> walletService.withdrawById(wallet.getId(), new BigDecimal("200.00"), user.getId()))
             .isInstanceOf(ResponseStatusException.class)
             .hasMessageContaining("fraudulent");
 
@@ -150,7 +150,7 @@ class WalletServiceImplTest {
         when(transactionRepository.countByWalletAndCreatedAtAfter(any(), any())).thenReturn(0L);
         when(fraudDetectionService.isFraudulent(any(FraudCheckRequest.class))).thenReturn(false);
 
-        walletService.transferRequest(req);
+        walletService.transferRequest(req, user.getId());
 
         assertThat(wallet.getBalance()).isEqualByComparingTo("350.00");
         assertThat(toWallet.getBalance()).isEqualByComparingTo("250.00");
@@ -176,7 +176,7 @@ class WalletServiceImplTest {
         when(walletRepository.findById(wallet.getId())).thenReturn(Optional.of(wallet));
         when(walletRepository.findById(toWallet.getId())).thenReturn(Optional.of(toWallet));
 
-        assertThatThrownBy(() -> walletService.transferRequest(req))
+        assertThatThrownBy(() -> walletService.transferRequest(req, user.getId()))
             .isInstanceOf(ResponseStatusException.class)
             .hasMessageContaining("Transfer Unsuccessful");
 
@@ -204,7 +204,7 @@ class WalletServiceImplTest {
         when(transactionRepository.countByWalletAndCreatedAtAfter(any(), any())).thenReturn(0L);
         when(fraudDetectionService.isFraudulent(any(FraudCheckRequest.class))).thenReturn(true);
 
-        assertThatThrownBy(() -> walletService.transferRequest(req))
+        assertThatThrownBy(() -> walletService.transferRequest(req, user.getId()))
             .isInstanceOf(ResponseStatusException.class)
             .hasMessageContaining("fraudulent");
 
@@ -220,7 +220,7 @@ class WalletServiceImplTest {
         when(walletRepository.findById(wallet.getId())).thenReturn(Optional.of(wallet));
         when(transactionRepository.findByWallet(wallet)).thenReturn(List.of(tx));
 
-        List<Transaction> result = walletService.getTransactionsByWallet(wallet.getId());
+        List<Transaction> result = walletService.getTransactionsByWallet(wallet.getId(), user.getId());
 
         assertThat(result).hasSize(1).containsExactly(tx);
     }
