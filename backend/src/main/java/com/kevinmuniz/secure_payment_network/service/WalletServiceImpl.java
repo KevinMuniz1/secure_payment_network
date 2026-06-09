@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
@@ -28,14 +27,21 @@ import com.kevinmuniz.secure_payment_network.repository.WalletRepository;
 public class WalletServiceImpl implements WalletService {
 
     private final TransactionRepository transactionRepository;
+    private final WalletRepository walletRepository;
+    private final UserRepository userRepository;
+    private final AuditLogService auditLogService;
+    private final FraudDetectionService fraudDetectionService;
 
-    @Autowired private WalletRepository walletRepository;
-    @Autowired private UserRepository userRepository;
-    @Autowired private AuditLogService auditLogService;
-    @Autowired private FraudDetectionService fraudDetectionService;
-
-    WalletServiceImpl(TransactionRepository transactionRepository) {
+    WalletServiceImpl(TransactionRepository transactionRepository,
+                      WalletRepository walletRepository,
+                      UserRepository userRepository,
+                      AuditLogService auditLogService,
+                      FraudDetectionService fraudDetectionService) {
         this.transactionRepository = transactionRepository;
+        this.walletRepository = walletRepository;
+        this.userRepository = userRepository;
+        this.auditLogService = auditLogService;
+        this.fraudDetectionService = fraudDetectionService;
     }
 
     public Wallet createWalletForUser(UUID userId, CreateWalletRequest createWalletRequest) {

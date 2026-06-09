@@ -75,7 +75,6 @@ class WalletServiceImplTest {
     @Test
     void depositById_increasesBalanceAndSavesTransaction() {
         when(walletRepository.findById(wallet.getId())).thenReturn(Optional.of(wallet));
-        when(transactionRepository.findByWallet(wallet)).thenReturn(Collections.emptyList());
 
         walletService.depositById(wallet.getId(), new BigDecimal("100.00"));
 

@@ -21,9 +21,9 @@ import jakarta.servlet.http.HttpServletResponse;
 @Component
 public class RateLimiterFilter implements Filter {
 
-    private static final int LOGIN_LIMIT = 5;
-    private static final int TRANSACTION_LIMIT = 10;
-    private static final int GENERAL_LIMIT = 60;
+    private static final int LOGIN_LIMIT = 10;
+    private static final int TRANSACTION_LIMIT = 200;
+    private static final int GENERAL_LIMIT = 300;
 
     private final Map<String, AtomicInteger> requestCounts = new ConcurrentHashMap<>();
     private final Map<String, LocalDateTime> windowStart = new ConcurrentHashMap<>();
