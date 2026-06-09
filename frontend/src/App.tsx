@@ -1,5 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-import { AuthProvider } from './context/AuthContext'
+import { Routes, Route, Navigate } from 'react-router-dom'
 import ProtectedRoute from './components/ProtectedRoute'
 
 import Login         from './pages/Login'
@@ -13,27 +12,23 @@ import Security      from './pages/SecurityMonitors'
 
 export default function App() {
   return (
-    <AuthProvider>
-      <BrowserRouter>
-        <Routes>
-          {/* Public */}
-          <Route path="/login"      element={<Login />} />
-          <Route path="/register"   element={<Register />} />
-          <Route path="/verify-2fa" element={<TwoFactor />} />
+    <Routes>
+      {/* Public */}
+      <Route path="/login"      element={<Login />} />
+      <Route path="/register"   element={<Register />} />
+      <Route path="/verify-2fa" element={<TwoFactor />} />
 
-          {/* Protected */}
-          <Route element={<ProtectedRoute />}>
-            <Route path="/dashboard"         element={<Dashboard />} />
-            <Route path="/wallets"           element={<Wallets />} />
-            <Route path="/wallets/:id"       element={<WalletDetail />} />
-            <Route path="/transactions"      element={<Transactions />} />
-            <Route path="/security"          element={<Security />} />
-          </Route>
+      {/* Protected */}
+      <Route element={<ProtectedRoute />}>
+        <Route path="/dashboard"         element={<Dashboard />} />
+        <Route path="/wallets"           element={<Wallets />} />
+        <Route path="/wallets/:id"       element={<WalletDetail />} />
+        <Route path="/transactions"      element={<Transactions />} />
+        <Route path="/security"          element={<Security />} />
+      </Route>
 
-          {/* Fallback */}
-          <Route path="*" element={<Navigate to="/login" replace />} />
-        </Routes>
-      </BrowserRouter>
-    </AuthProvider>
+      {/* Fallback */}
+      <Route path="*" element={<Navigate to="/login" replace />} />
+    </Routes>
   )
 }

@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
 import { Shield } from "lucide-react";
-import { completeEmailOtp, completeTOTP } from "@/api/auth";
+import { completeEmailOtp, completeTotp } from "@/api/auth";
 import { useAuth } from "@/context/AuthContext";
 
 interface LocationState {
@@ -47,11 +47,11 @@ export default function Verify2FA() {
   async function onSubmit(data: FormData) {
     setLoading(true);
     try {
-      const response = isTOTP
-        ? await completeTOTP(preAuthToken, data.code)
+      const { data: res } = isTOTP
+        ? await completeTotp(preAuthToken, data.code)
         : await completeEmailOtp(preAuthToken, data.code);
 
-      auth.login(response);
+      auth.login(res.token, res.refreshToken, res.email, res.role);
       toast.success("Verified successfully!");
       navigate("/dashboard");
     } catch (err: unknown) {
