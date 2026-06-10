@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
+import { QRCodeSVG } from 'qrcode.react'
 import {
   setupTotp, verifyTotp, setupEmailOtp, verifyEmailOtp,
   disableTotp, disableEmailOtp,
@@ -152,7 +153,11 @@ export default function Security() {
               className="mb-6 p-6 text-center"
               style={{ backgroundColor: '#0d0d0d', border: '1px solid #1e1e1e' }}
             >
-              {qrUrl && <img src={qrUrl} alt="QR code" className="mx-auto w-40 h-40" />}
+              {qrUrl && (
+                <div className="inline-block p-3" style={{ backgroundColor: '#ffffff' }}>
+                  <QRCodeSVG value={qrUrl} size={160} />
+                </div>
+              )}
               <p className="text-xs mt-3" style={{ color: '#555' }}>
                 Scan with your authenticator app, then enter the 6-digit code below.
               </p>

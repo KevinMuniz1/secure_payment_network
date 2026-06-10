@@ -22,6 +22,11 @@ public class SendGridEmailServiceImpl implements EmailService {
 
     @Override
     public void sendOtpEmail(String toEmail, String code) {
+        if (apiKey == null || apiKey.isBlank() || apiKey.equals("dummy-key")) {
+            System.out.println("[DEV] OTP for " + toEmail + ": " + code);
+            return;
+        }
+
         Email from = new Email(fromEmail);
         Email to = new Email(toEmail);
         String subject = "Your Secure Payment Network verification code";

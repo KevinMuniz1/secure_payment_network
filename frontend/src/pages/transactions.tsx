@@ -15,24 +15,54 @@ const typeSign = (t: string) =>
 
 export default function Transactions() {
   const [wallets, setWallets]           = useState<Wallet[]>([])
-  const [selectedWallet, setSelected]   = useState<string>('')
+  const [selectedWallet, setSelected]   = useState<string>('ALL')
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [loading, setLoading]           = useState(false)
+  const [error, setError]               = useState<string>('')
   const [filter, setFilter]             = useState<string>('ALL')
 
   useEffect(() => {
-    getWallets().then(({ data }) => {
-      setWallets(data)
-      if (data.length > 0) setSelected(data[0].id)
-    })
+    getWallets()
+      .then(({ data }) => {
+        setWallets(data)
+        // start on "All Accounts" so users see everything immediately
+        setLoading(true)
+        Promise.all(data.map((w) => getTransactions(w.id).then((r) => r.data).catch(() => [])))
+          .then((results) => {
+            const all = results.flat().sort(
+              (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+            )
+            setTransactions(all)
+          })
+          .finally(() => setLoading(false))
+      })
+      .catch(() => setError('Failed to load accounts.'))
   }, [])
 
   useEffect(() => {
-    if (!selectedWallet) return
+    if (selectedWallet === 'ALL') {
+      setLoading(true)
+      setError('')
+      Promise.all(wallets.map((w) => getTransactions(w.id).then((r) => r.data).catch(() => [])))
+        .then((results) => {
+          const all = results.flat().sort(
+            (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          )
+          setTransactions(all)
+        })
+        .catch(() => setError('Failed to load transactions.'))
+        .finally(() => setLoading(false))
+      return
+    }
     setLoading(true)
+    setError('')
     getTransactions(selectedWallet)
       .then(({ data }) => setTransactions(data))
-      .catch(() => setTransactions([]))
+      .catch((err) => {
+        const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message
+        setError(msg ?? 'Failed to load transactions.')
+        setTransactions([])
+      })
       .finally(() => setLoading(false))
   }, [selectedWallet])
 
@@ -61,6 +91,7 @@ export default function Transactions() {
           className="px-0 py-2 text-sm text-white bg-transparent focus:outline-none appearance-none"
           style={{ borderBottom: '1px solid #ffffff', borderTop: 'none', borderLeft: 'none', borderRight: 'none', borderRadius: 0, minWidth: '160px' }}
         >
+          <option value="ALL" style={{ backgroundColor: '#111' }}>All Accounts</option>
           {wallets.map((w) => (
             <option key={w.id} value={w.id} style={{ backgroundColor: '#111' }}>{w.walletName}</option>
           ))}
@@ -82,6 +113,13 @@ export default function Transactions() {
           </div>
         ))}
       </div>
+
+      {/* Error banner */}
+      {error && (
+        <div className="mb-6 px-4 py-3 text-xs" style={{ backgroundColor: 'rgba(248,113,113,0.08)', color: '#f87171', border: '1px solid rgba(248,113,113,0.2)' }}>
+          {error}
+        </div>
+      )}
 
       {/* Filter tabs */}
       <div className="flex gap-2 mb-6">
